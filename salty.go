@@ -6,6 +6,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"crypto/sha256"
+	"encoding/base64"
 	"encoding/hex"
 )
 
@@ -80,6 +81,22 @@ func SaltyEncodeToHexString(plain, password, salt []byte) (string, error) {
 
 func SaltyDecodeFromHexString(encoded string, password, salt []byte) ([]byte, error) {
 	decoded, err := hex.DecodeString(encoded)
+	if err != nil {
+		return nil, err
+	}
+	return SaltyDecode(decoded, password, salt)
+}
+
+func SaltyEncodeToBase64(plain, password, salt []byte) (string, error) {
+	encoded, err := SaltyEncode(plain, password, salt)
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(encoded), nil
+}
+
+func SaltyDecodeFromBase64(encoded string, password, salt []byte) ([]byte, error) {
+	decoded, err := base64.StdEncoding.DecodeString(encoded)
 	if err != nil {
 		return nil, err
 	}

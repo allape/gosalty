@@ -2,6 +2,7 @@ package gosalty
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/hex"
 	"testing"
 )
@@ -41,5 +42,27 @@ func TestEncode(t *testing.T) {
 
 	if bytes.Compare(secret, decoded) != 0 {
 		t.Fatalf("SaltyDecodeFromHexString failed: secret != decoded")
+	}
+
+	encoded, err = SaltyEncodeToBase64(secret, Password, TextSalt)
+	if err != nil {
+		t.Fatalf("SaltyEncodeToBase64 failed: %v", err)
+	}
+
+	t.Logf("encoded: %s", encoded)
+
+	if encoded == base64.StdEncoding.EncodeToString(secret) {
+		t.Fatalf("SaltyEncodeToBase64 failed: encoded == secret")
+	}
+
+	decoded, err = SaltyDecodeFromBase64(encoded, Password, TextSalt)
+	if err != nil {
+		t.Fatalf("SaltyDecodeFromBase64 failed: %v", err)
+	}
+
+	t.Logf("decoded: %s", decoded)
+
+	if bytes.Compare(secret, decoded) != 0 {
+		t.Fatalf("SaltyDecodeFromBase64 failed: secret != decoded")
 	}
 }
